@@ -1,0 +1,95 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "https://konflux-ci.dev/spdxdocs/sbom-for-oci-copy-task/a29a127a-daf6-44d3-a840-4eca194e9b41",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "creationInfo": {
+    "created": "2025-01-14T11:46:34Z",
+    "creators": [
+      "Tool: Konflux"
+    ]
+  },
+  "name": "sbom-for-modelcar-task",
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-image-repository.example.com/aipcc/modelcar-image-8ef392004884ee00ccaabd279ea6859fc021c7b613f3103f568277f078764998",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "8ef392004884ee00ccaabd279ea6859fc021c7b613f3103f568277f078764998"
+        }
+      ],
+      "downloadLocation": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceLocator": "pkg:oci/aipcc/modelcar-image@8ef392004884ee00ccaabd279ea6859fc021c7b613f3103f568277f078764998?repository_url=repository.example.com/aipcc/modelcar-image",
+          "referenceType": "purl"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "name": "aipcc/modelcar-image",
+      "supplier": "NOASSERTION",
+      "versionInfo": "v1.0"
+    },
+    {
+      "SPDXID": "SPDXRef-image-repository.example.com/aipcc/base-image-3a7bd3e2360a5d5f1a4e4b8a4c6e0d3f2a4b2c8a5f1e6d7b8a9c0d1e2f3a4b5",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "3a7bd3e2360a5d5f1a4e4b8a4c6e0d3f2a4b2c8a5f1e6d7b8a9c0d1e2f3a4b5"
+        }
+      ],
+      "downloadLocation": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceLocator": "pkg:oci/aipcc/base-image@3a7bd3e2360a5d5f1a4e4b8a4c6e0d3f2a4b2c8a5f1e6d7b8a9c0d1e2f3a4b5?repository_url=repository.example.com/aipcc/base-image",
+          "referenceType": "purl"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "name": "aipcc/base-image",
+      "supplier": "NOASSERTION",
+      "versionInfo": "v2.3"
+    },
+    {
+      "SPDXID": "SPDXRef-image-repository.example.com/aipcc/model-image-9f1e2d3c4b5a6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "9f1e2d3c4b5a6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1"
+        }
+      ],
+      "downloadLocation": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceLocator": "pkg:oci/aipcc/model-image@9f1e2d3c4b5a6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1?repository_url=repository.example.com/aipcc/model-image",
+          "referenceType": "purl"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "name": "aipcc/model-image",
+      "supplier": "NOASSERTION",
+      "versionInfo": "v1.1"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-image-repository.example.com/aipcc/modelcar-image-8ef392004884ee00ccaabd279ea6859fc021c7b613f3103f568277f078764998"
+    },
+    {
+      "spdxElementId": "SPDXRef-image-repository.example.com/aipcc/modelcar-image-8ef392004884ee00ccaabd279ea6859fc021c7b613f3103f568277f078764998",
+      "relationshipType": "DESCENDANT_OF",
+      "relatedSpdxElement": "SPDXRef-image-repository.example.com/aipcc/base-image-3a7bd3e2360a5d5f1a4e4b8a4c6e0d3f2a4b2c8a5f1e6d7b8a9c0d1e2f3a4b5"
+    },
+    {
+      "spdxElementId": "SPDXRef-image-repository.example.com/aipcc/modelcar-image-8ef392004884ee00ccaabd279ea6859fc021c7b613f3103f568277f078764998",
+      "relationshipType": "DESCENDANT_OF",
+      "relatedSpdxElement": "SPDXRef-image-repository.example.com/aipcc/model-image-9f1e2d3c4b5a6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1"
+    }
+  ]
+}
