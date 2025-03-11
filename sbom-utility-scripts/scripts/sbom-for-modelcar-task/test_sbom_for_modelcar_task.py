@@ -20,9 +20,9 @@ def test_main(sbom_type: str, capsys: pytest.CaptureFixture[str], monkeypatch: p
         lambda: datetime.datetime(2025, 1, 14, 11, 46, 34, tzinfo=datetime.UTC),
     )
 
-    MODELCAR_IMAGE = "repository.example.com/aipcc/modelcar-image:v1.0@sha256:8ef392004884ee00ccaabd279ea6859fc021c7b613f3103f568277f078764998"
-    BASE_IMAGE = "repository.example.com/aipcc/base-image:v2.3@sha256:3a7bd3e2360a5d5f1a4e4b8a4c6e0d3f2a4b2c8a5f1e6d7b8a9c0d1e2f3a4b5"
-    MODEL_IMAGE = "repository.example.com/aipcc/model-image:v1.1@sha256:9f1e2d3c4b5a6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1"
+    MODELCAR_IMAGE = "repository.example.com/aipcc/modelcar-image:v1.0@sha256:cc6016b62f25d56507033c48b04517ba40b3490b1e9b01f1c485371311ed42c4"
+    BASE_IMAGE = "repository.example.com/aipcc/base-image:v2.3@sha256:96fbb4c227d543011dfff0679a89ce664d1a009654858f2df28be504bc1863c1"
+    MODEL_IMAGE = "repository.example.com/aipcc/model-image:v1.1@sha256:087dc7896b97911a582702b45ff1d41ffa3e142d0b000b0fbb11058188293cfc"
 
     monkeypatch.setattr(
         sys,

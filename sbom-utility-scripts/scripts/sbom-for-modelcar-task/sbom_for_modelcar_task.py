@@ -1,3 +1,25 @@
+"""
+
+
+
+The script requires 2 references, the Model OCI artifact where the model files will be extracted from, and the Base Image for the ModelCar image.
+
+The SBOM report has the following structure:
+
+- There are 3 components reported in the SBOM, the Modelcar image, and the Base and Model images
+- The Modelcar component is a DESCENDANT OF both the Model and the Base images
+
+usage: sbom_for_modelcar_task.py [-h] --modelcar-image MODELCAR_IMAGE --base-image BASE_IMAGE --model-image MODEL_IMAGE [-o OUTPUT_FILE] [--sbom-type {cyclonedx,spdx}]
+
+options:
+  -h, --help            show this help message and exit
+  --modelcar-image MODELCAR_IMAGE    Modelcar OCI artifact reference resolved to digest (e.g., quay.io/foo/modelcar_image@sha256:abcdef1234567890...
+  --base-image BASE_IMAGE            Base image OCI artifact reference resolved to digest (e.g., quay.io/foo/base_image@sha256:abcdef1234567890...
+  --model-image MODEL_IMAGE          Model OCI artifact reference resolved to digest (e.g., quay.io/foo/model_image@sha256:abcdef1234567890...
+  -o OUTPUT_FILE, --output-file OUTPUT_FILE
+  --sbom-type {cyclonedx,spdx}
+"""
+
 import argparse
 import datetime
 import json
@@ -124,13 +146,16 @@ def get_spdx_package_from_ociartifact(artifact: OCIArtifact) -> dict[str, Any]:
 
 
 def _to_cyclonedx_sbom(modelcar: OCIArtifact, base: OCIArtifact, model: OCIArtifact) -> dict[str, Any]:
+
+    modelcar_component = get_cyclonedx_component_from_ociartifact(modelcar)
+    modelcar_component["components"] = list(map(get_cyclonedx_component_from_ociartifact, [base, model]))
     return {
         "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
         "bomFormat": "CycloneDX",
         "specVersion": "1.5",
         "version": 1,
         "metadata": {"component": get_cyclonedx_component_from_ociartifact(modelcar)},
-        "components": list(map(get_cyclonedx_component_from_ociartifact, [modelcar, base, model])),
+        "components": [modelcar_component],
     }
 
 
@@ -183,6 +208,13 @@ def _to_spdx_sbom(
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.description = "This script provides a helper function to generate an SBOM reports for ModelCar images."
+    ap.epilog = """
+        A ModelCar is a containerized approach to deploying machine learning models. It involves packaging
+        model artifacts within a container image, enabling efficient and standardized deployment in
+        Kubernetes environments, used as Sidecar containers (secondary containers that run alongside the
+        main application container within the same Pod)
+    """
     ap.add_argument(
         "--modelcar-image",
         type=str,
