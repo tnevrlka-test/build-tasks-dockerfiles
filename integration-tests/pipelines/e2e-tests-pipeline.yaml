@@ -20,28 +20,32 @@ spec:
         params:
         - name: SNAPSHOT
         results:
-          - name: custom-source-build-bundle
+          - name: custom-build-bundle
             description: "custom bundle for source build pipeline"
         steps:
           - name: e2e-tests
-            image: quay.io/konflux-ci/appstudio-utils:ab6b0b8e40e440158e7288c73aff1cf83a2cc8a9@sha256:24179f0efd06c65d16868c2d7eb82573cce8e43533de6cea14fec3b7446e0b14
+            image: quay.io/konflux-ci/appstudio-utils:48c311af02858e2422d6229600e9959e496ddef1@sha256:91ddd999271f65d8ec8487b10f3dd378f81aa894e11b9af4d10639fd52bba7e8
             env:
             - name: SNAPSHOT
               value: $(params.SNAPSHOT)
             script: |
+              set -e
               echo "SNAPSHOT: ${SNAPSHOT}"
-              export SOURCE_IMAGE=$(jq -r '.components[] | select(.name == "source-container-build") | .containerImage' <<< "$SNAPSHOT")
-              echo "Built image: ${SOURCE_IMAGE}"
-
-              git clone --branch main https://github.com/redhat-appstudio/e2e-tests.git
+              export SOURCE_BUILD_IMAGE=$(jq -r '.components[] | select(.name == "source-container-build") | .containerImage' <<< "$SNAPSHOT")
+              export SBOM_UTILITY_SCRIPTS_IMAGE=$(jq -r '.components[] | select(.name == "sbom-utility-scripts") | .containerImage' <<< "$SNAPSHOT")
+              export ICM_INJECTION_SCRIPTS_IMAGE=$(jq -r '.components[] | select(.name == "icm-injection-scripts") | .containerImage' <<< $SNAPSHOT)
+              git clone --branch main https://github.com/konflux-ci/e2e-tests.git
               cd e2e-tests/
-              make setup-source-build | tee cmd_output
+              make setup-bundle-for-build-tasks-dockerfiles-group-build | tee cmd_output
               last_line_output=$(tail -n 1 cmd_output)
               IFS='='
               read -ra arr <<< "$last_line_output"
-              custom_source_build_bundle=${arr[1]}
-
-              echo -n ${custom_source_build_bundle} | tee $(results.custom-source-build-bundle.path)
+              custom_pipeline_bundle=${arr[1]}
+              if [[ "$custom_pipeline_bundle" == "" ]]; then
+                echo "Failed to read pipeline bundle, exiting..."
+                exit 1
+              fi
+              echo -n ${custom_pipeline_bundle} | tee $(results.custom-build-bundle.path)
 
     - name: run-e2e-tests
       params:
@@ -53,8 +57,8 @@ spec:
           value: "https://github.com/konflux-ci/build-definitions.git"
         - name: ec_pipelines_repo_revision
           value: "main"
-        - name: custom_source_build_bundle
-          value: "$(tasks.prepare-e2e-tests.results.custom-source-build-bundle)"
+        - name: custom_build_bundle
+          value: "$(tasks.prepare-e2e-tests.results.custom-build-bundle)"
       runAfter:
         - prepare-e2e-tests
       taskRef:
