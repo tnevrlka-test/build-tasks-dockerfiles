@@ -106,7 +106,7 @@ from index_image_sbom_script import create_sbom, main
                         ],
                     },
                     {
-                        "SPDXID": "SPDXRef-image-ubi9-micro-container-8358c7002e15f219c861227e97919d537e888874e7ca2b349979bc745f903195",
+                        "SPDXID": "SPDXRef-image-ubi9-micro-container-d57d132860ab3ff4eb64267c33897a8bf246ae1515df7d17cdf6e408c9f36b36",
                         "name": "ubi9-micro-container_ppc64le",
                         "versionInfo": "9.4-6.1716471860",
                         "supplier": "NOASSERTION",
@@ -118,16 +118,11 @@ from index_image_sbom_script import create_sbom, main
                                 "referenceType": "purl",
                                 "referenceLocator": "pkg:oci/ubi9-micro-container@sha256:1c8483e0fda0e990175eb9855a5f15e0910d2038dd397d9e2b357630f0321e6d?arch=ppc64le&repository_url=quay.io/ubi9-micro-container",
                             },
-                            {
-                                "referenceCategory": "PACKAGE-MANAGER",
-                                "referenceType": "purl",
-                                "referenceLocator": "pkg:oci/ubi9-micro-container@sha256:f08722139c4da653b870272a192fac700960a3315baa1f79f83a4712a436d4?repository_url=quay.io/ubi9-micro-container",
-                            },
                         ],
                         "checksums": [
                             {
                                 "algorithm": "SHA256",
-                                "checksumValue": "f08722139c4da653b870272a192fac700960a3315baa1f79f83a4712a436d4",
+                                "checksumValue": "1c8483e0fda0e990175eb9855a5f15e0910d2038dd397d9e2b357630f0321e6d",
                             }
                         ],
                     },
@@ -139,7 +134,7 @@ from index_image_sbom_script import create_sbom, main
                         "relatedSpdxElement": "SPDXRef-image-index",
                     },
                     {
-                        "spdxElementId": "SPDXRef-image-ubi9-micro-container-8358c7002e15f219c861227e97919d537e888874e7ca2b349979bc745f903195",
+                        "spdxElementId": "SPDXRef-image-ubi9-micro-container-d57d132860ab3ff4eb64267c33897a8bf246ae1515df7d17cdf6e408c9f36b36",
                         "relationshipType": "VARIANT_OF",
                         "relatedSpdxElement": "SPDXRef-image-index",
                     },
@@ -239,7 +234,7 @@ def test_main(
                     "checksums": [{"algorithm": "SHA256", "checksumValue": "456"}],
                 },
                 {
-                    "SPDXID": "SPDXRef-image-bar-9adebc2aa46e921bcd2ff839697cf543a898d9b66e1cbf6dfc0626cf2845f716",
+                    "SPDXID": "SPDXRef-image-bar-c621206f7eb4159018ebf3fc192df8d270b15121bcdc653b468df1fe131860b1",
                     "name": "bar_arm64",
                     "versionInfo": "v1",
                     "supplier": "NOASSERTION",
@@ -251,13 +246,8 @@ def test_main(
                             "referenceType": "purl",
                             "referenceLocator": "pkg:oci/bar@sha256:456?arch=arm64&repository_url=quay.io/foo/bar",
                         },
-                        {
-                            "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceType": "purl",
-                            "referenceLocator": "pkg:oci/bar@sha256:123?repository_url=quay.io/foo/bar",
-                        },
                     ],
-                    "checksums": [{"algorithm": "SHA256", "checksumValue": "123"}],
+                    "checksums": [{"algorithm": "SHA256", "checksumValue": "456"}],
                 },
             ],
             "relationships": [
@@ -267,7 +257,7 @@ def test_main(
                     "relatedSpdxElement": "SPDXRef-image-index",
                 },
                 {
-                    "spdxElementId": "SPDXRef-image-bar-9adebc2aa46e921bcd2ff839697cf543a898d9b66e1cbf6dfc0626cf2845f716",
+                    "spdxElementId": "SPDXRef-image-bar-c621206f7eb4159018ebf3fc192df8d270b15121bcdc653b468df1fe131860b1",
                     "relationshipType": "VARIANT_OF",
                     "relatedSpdxElement": "SPDXRef-image-index",
                 },
