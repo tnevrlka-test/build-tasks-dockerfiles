@@ -12,10 +12,24 @@ spec:
       default: "build-templates-e2e"
       description: "namespace where e2e-tests will be executed"
   tasks:
+    - name: test-metadata
+      taskRef:
+        resolver: git
+        params:
+          - name: url
+            value: https://github.com/konflux-ci/tekton-integration-catalog.git
+          - name: revision
+            value: main
+          - name: pathInRepo
+            value: common/tasks/test-metadata/0.1/test-metadata.yaml
     - name: prepare-e2e-tests
       params:
         - name: SNAPSHOT
           value: $(params.SNAPSHOT)
+      when:
+        - input: "$(tasks.test-metadata.results.test-event-type)"
+          operator: in
+          values: ["pull_request"]
       taskSpec:
         params:
         - name: SNAPSHOT
@@ -59,6 +73,10 @@ spec:
           value: "main"
         - name: custom_build_bundle
           value: "$(tasks.prepare-e2e-tests.results.custom-build-bundle)"
+      when:
+        - input: "$(tasks.test-metadata.results.test-event-type)"
+          operator: in
+          values: ["pull_request"]
       runAfter:
         - prepare-e2e-tests
       taskRef:
