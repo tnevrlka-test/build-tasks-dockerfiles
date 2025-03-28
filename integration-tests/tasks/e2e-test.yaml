@@ -14,7 +14,7 @@ spec:
       type: string
     - name: ec_pipelines_repo_revision
       type: string
-    - name: custom_source_build_bundle
+    - name: custom_build_bundle
       type: string
   steps:
     - name: e2e-test
@@ -50,5 +50,5 @@ spec:
         value: $(params.ec_pipelines_repo_url)
       - name: EC_PIPELINES_REPO_REVISION
         value: $(params.ec_pipelines_repo_revision)
-      - name: CUSTOM_SOURCE_BUILD_PIPELINE_BUNDLE
-        value: $(params.custom_source_build_bundle)
+      - name: CUSTOM_BUILD_PIPELINE_BUNDLE
+        value: $(params.custom_build_bundle)
