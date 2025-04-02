@@ -716,10 +716,15 @@ class TestBuildProcess(unittest.TestCase):
             "--registry-allowlist",
             REGISTRY_ALLOWLIST,
         ]
-        with patch("sys.argv", cli_cmd):
-            rc = source_build.main()
+
+        with self.assertLogs() as logs:
+            with patch("sys.argv", cli_cmd):
+                rc = source_build.main()
 
         self.assertEqual(1, rc)
+        self.assertRegex(
+            "\n".join(logs.output), r"command execution failure, status: \d+, stderr: .+"
+        )
 
         with open(self.result_file, "r") as f:
             build_result: BuildResult = json.loads(f.read())
