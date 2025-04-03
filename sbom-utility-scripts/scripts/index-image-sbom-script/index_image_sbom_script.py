@@ -55,33 +55,26 @@ class Image:
         _, val = self.digest.split(":")
         return val
 
-    def purls(self, index_digest: Optional[str] = None) -> list[str]:
-        ans = []
-        if index_digest and self.arch:
-            ans.append(
-                PackageURL(
-                    type="oci",
-                    name=self.name,
-                    version=index_digest,
-                    qualifiers={"arch": self.arch, "repository_url": self.repository},
-                ).to_string()
-            )
-        ans.append(
-            PackageURL(
-                type="oci",
-                name=self.name,
-                version=self.digest,
-                qualifiers={"repository_url": self.repository},
-            ).to_string()
-        )
-        return ans
+    def purl(self) -> str:
+        qualifiers = {"repository_url": self.repository}
+        if self.arch is not None:
+            qualifiers["arch"] = self.arch
+
+        purl = PackageURL(
+            type="oci",
+            name=self.name,
+            version=self.digest,
+            qualifiers=qualifiers,
+        ).to_string()
+
+        return purl
 
     def propose_spdx_id(self) -> str:
-        purl_hex_digest = hashlib.sha256(self.purls()[0].encode()).hexdigest()
+        purl_hex_digest = hashlib.sha256(self.purl().encode()).hexdigest()
         return f"SPDXRef-image-{self.name}-{purl_hex_digest}"
 
 
-def create_package(image: Image, spdxid: Optional[str] = None, image_index_digest: Optional[str] = None) -> dict:
+def create_package(image: Image, spdxid: Optional[str] = None) -> dict:
     return {
         "SPDXID": image.propose_spdx_id() if not spdxid else spdxid,
         "name": image.name if not image.arch else f"{image.name}_{image.arch}",
@@ -93,9 +86,8 @@ def create_package(image: Image, spdxid: Optional[str] = None, image_index_diges
             {
                 "referenceCategory": "PACKAGE-MANAGER",
                 "referenceType": "purl",
-                "referenceLocator": purl,
+                "referenceLocator": image.purl(),
             }
-            for purl in image.purls(image_index_digest)
         ],
         "checksums": [
             {
@@ -125,7 +117,7 @@ def create_sbom(
     image_index_obj = Image.from_image_index_url_and_digest(image_index_url, image_index_digest)
     sbom_name = f"{image_index_obj.repository}@{image_index_obj.digest}"
 
-    packages = [create_package(image_index_obj, "SPDXRef-image-index")]
+    packages = [create_package(image_index_obj, spdxid="SPDXRef-image-index")]
     relationships = [
         {
             "spdxElementId": "SPDXRef-DOCUMENT",
@@ -141,11 +133,11 @@ def create_sbom(
         arch_image = Image(
             arch=manifest.get("platform", {}).get("architecture"),
             name=image_index_obj.name,
-            digest=manifest.get("digest"),
+            digest=image_index_digest,
             tag=image_index_obj.tag,
             repository=image_index_obj.repository,
         )
-        packages.append(create_package(arch_image, image_index_digest=image_index_obj.digest))
+        packages.append(create_package(arch_image))
         relationships.append(get_relationship(arch_image.propose_spdx_id(), "SPDXRef-image-index"))
 
     sbom = {
