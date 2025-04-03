@@ -13,6 +13,11 @@ spec:
       description: "namespace where e2e-tests will be executed"
   tasks:
     - name: test-metadata
+      params:
+        - name: SNAPSHOT
+          value: $(params.SNAPSHOT)
+        - name: test-name
+          value: $(context.pipelineRun.name)
       taskRef:
         resolver: git
         params:

@@ -18,7 +18,7 @@ import tempfile
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
-from subprocess import run
+from subprocess import CalledProcessError, run
 from tarfile import TarInfo
 from typing import Any, TypedDict, NotRequired, Literal, Final, Dict
 from urllib.parse import urlparse
@@ -1085,7 +1085,12 @@ def main() -> int:
         build_result = build(build_args)
     except Exception as e:
         build_result = {"status": "failure", "message": str(e)}
-        logger.exception("failed to build source image")
+        if isinstance(e, CalledProcessError):
+            logger.exception(
+                "command execution failure, status: %d, stderr: %s", e.returncode, e.stderr
+            )
+        else:
+            logger.exception("failed to build source image")
 
     logger.info("build result %s", json.dumps(build_result))
     if build_args.result_file:
