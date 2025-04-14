@@ -1292,3 +1292,28 @@ class TestResolveSourceImageByManifest(unittest.TestCase):
         source_image = source_build.resolve_source_image_by_manifest("registry.io:3000/ns/app:1.0")
 
         self.assertIsNone(source_image)
+
+
+class TestUnsignedSourceImage(unittest.TestCase):
+
+    def setUp(self):
+        self.called_proc_err = CalledProcessError(
+            -1,
+            "mock cmd",
+            stderr="Source image rejected: A signature was required, but no signature exists".encode(),  # noqa: E501 (ignore line too long)
+        )
+
+    @patch("source_build.run")
+    def test_source_image_is_unsigned_and_not_ingored(self, run: MagicMock):
+        run.side_effect = self.called_proc_err
+
+        with pytest.raises(source_build.NoSignatureError):
+            source_build.download_parent_image_sources("", "", ignore_unsigned_image=False)
+
+    @patch("source_build.run")
+    def test_source_image_is_unsigned_and_ignored(self, run: MagicMock):
+        run.side_effect = self.called_proc_err
+
+        sources_dir = source_build.download_parent_image_sources("", "", ignore_unsigned_image=True)
+
+        self.assertEqual(sources_dir, "")
