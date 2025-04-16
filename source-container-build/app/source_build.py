@@ -1,6 +1,7 @@
 #!/usr/bin/python3.11
 
 import argparse
+import subprocess
 import filetype
 import functools
 import hashlib
@@ -56,6 +57,10 @@ class BuildResult(TypedDict):
     base_image_source_included: bool
     image_url: str
     image_digest: str
+
+
+class NoSignatureError(Exception):
+    pass
 
 
 @dataclass
@@ -166,6 +171,11 @@ def parse_cli_args():
         help="Resolve source images for parent images pulled from the registry listed here. "
         "One registry per line.",
     )
+    parser.add_argument(
+        "--ignore-unsigned-image",
+        action="store_true",
+        help="When provided, the build will not fail when source image has missing signatures",
+    )
     return parser.parse_args()
 
 
@@ -194,7 +204,10 @@ def fetch_image_manifest_digest(image: str) -> str:
 
 
 def skopeo_copy(
-    src: str, dest: str, digest_file: str = "", remove_signatures: bool = False
+    src: str,
+    dest: str,
+    digest_file: str = "",
+    remove_signatures: bool = False,
 ) -> None:
     """Execute skopeo-copy
 
@@ -211,7 +224,17 @@ def skopeo_copy(
         flags.append("--remove-signatures")
     cmd = ["skopeo", "copy", *flags, src, dest]
     logger.debug("copy image: %r", cmd)
-    run(cmd, check=True)
+
+    try:
+        run(cmd, stderr=subprocess.PIPE, check=True)
+    except CalledProcessError as e:
+        is_missing_signatures = (
+            "Source image rejected: A signature was required, but no signature exists"
+            in e.stderr.decode()
+        )
+        if is_missing_signatures:
+            raise NoSignatureError(e.stderr.decode())
+        raise
 
 
 # produces an artifact name that includes artifact's architecture
@@ -400,7 +423,11 @@ def push_to_registry(image_build_output_dir: str, dest_images: list[str]) -> str
     src = f"oci:{image_build_output_dir}:latest-source"
     for dest_image in dest_images:
         logger.debug("push source image %r", dest_image)
-        skopeo_copy(src, f"docker://{dest_image}", digest_file=digest_file)
+        skopeo_copy(
+            src,
+            f"docker://{dest_image}",
+            digest_file=digest_file,
+        )
     with open(digest_file, "r") as f:
         return f.read().strip()
 
@@ -498,7 +525,9 @@ def parse_image_name(image: str) -> tuple[str, str, str]:
     return name, tag, digest
 
 
-def download_parent_image_sources(source_image: str, work_dir: str) -> str:
+def download_parent_image_sources(
+    source_image: str, work_dir: str, ignore_unsigned_image: bool = False
+) -> str:
     """Download parent sources that stored in OCI image layout
 
     :return: the directory holding the downloaded sources in the OCI image layout.
@@ -507,7 +536,28 @@ def download_parent_image_sources(source_image: str, work_dir: str) -> str:
     sources_dir = create_dir(work_dir, "parent_image_sources")
     logger.info("Copy source image %s into directory %s", source_image, sources_dir)
     # skopeo can not copy signatures to oci image layout
-    skopeo_copy(f"docker://{source_image}", f"oci:{sources_dir}", remove_signatures=True)
+
+    try:
+        skopeo_copy(
+            f"docker://{source_image}",
+            f"oci:{sources_dir}",
+            remove_signatures=True,
+        )
+    except NoSignatureError:
+        logger.info(
+            "Source image has no signature, deleting:",
+            os.path.join(
+                work_dir,
+                "parent_image_sources",
+            ),
+        )
+        shutil.rmtree(os.path.join(work_dir, "parent_image_sources"))
+        if ignore_unsigned_image:
+            logger.info("Ignored missing source image signatures")
+            return ""
+
+        raise
+
     return sources_dir
 
 
@@ -1050,7 +1100,9 @@ def build(args) -> BuildResult:
 
         source_image = resolve_source_image(base_image, args.registry_allowlist)
         if source_image:
-            parent_sources_dir = download_parent_image_sources(source_image, work_dir)
+            parent_sources_dir = download_parent_image_sources(
+                source_image, work_dir, args.ignore_unsigned_image
+            )
         else:
             logger.info("Source image is not resolved for image %s", base_image)
     else:
