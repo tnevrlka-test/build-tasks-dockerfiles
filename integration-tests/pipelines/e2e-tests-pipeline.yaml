@@ -54,7 +54,16 @@ spec:
               export SBOM_UTILITY_SCRIPTS_IMAGE=$(jq -r '.components[] | select(.name == "sbom-utility-scripts") | .containerImage' <<< "$SNAPSHOT")
               git clone --branch main https://github.com/konflux-ci/e2e-tests.git
               cd e2e-tests/
-              make setup-bundle-for-build-tasks-dockerfiles-group-build | tee cmd_output
+              if [[ "${SBOM_UTILITY_SCRIPTS_IMAGE}" != "" && "${SOURCE_BUILD_IMAGE}" != "" ]]; then
+                echo "Testing group PR"
+                make setup-bundle-for-build-tasks-dockerfiles-group-build | tee cmd_output
+              elif [[ "${SOURCE_BUILD_IMAGE}" != "" ]]; then
+                echo "Testing Source Build"
+                make setup-only-source-build | tee cmd_output
+              else
+                echo "[Error] Unknown scenario, execution of e2e-tests is not needed"
+                exit 1
+              fi
               last_line_output=$(tail -n 1 cmd_output)
               IFS='='
               read -ra arr <<< "$last_line_output"
