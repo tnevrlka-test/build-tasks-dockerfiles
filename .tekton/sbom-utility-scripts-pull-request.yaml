@@ -35,7 +35,8 @@ spec:
   - name: hermetic
     value: "true"
   - name: prefetch-input
-    value: '[{"type": "pip", "path": "sbom-utility-scripts/scripts/add-image-reference-script"},
+    value: '[{"type": "pip", "path": "sbom-utility-scripts"},
+      {"type": "pip", "path": "sbom-utility-scripts/scripts/add-image-reference-script"},
       {"type": "pip", "path": "sbom-utility-scripts/scripts/base-images-sbom-script/app"},
       {"type": "pip", "path": "sbom-utility-scripts/scripts/index-image-sbom-script"},
       {"type": "pip", "path": "sbom-utility-scripts/scripts/merge-sboms-script"},
