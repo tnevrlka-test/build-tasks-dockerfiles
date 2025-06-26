@@ -1,0 +1,4 @@
+setuptools>=40.8.0
+wheel
+flit_core<4,>=3.8
+Cython
