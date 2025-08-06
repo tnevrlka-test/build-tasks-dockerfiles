@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi9/python-312:9.6-1749108609@sha256:9d6f32c64224dd7f3a57ae5ad6a2ba62293cdf4e2e85fd3b195475ee19026c33
+FROM registry.access.redhat.com/ubi9/python-312:9.6-1754326132@sha256:8cf2ed9f376631e82a38e1b680332f7fda2955df61803ba660734559a8ed33d1
 
 WORKDIR /scripts
 
